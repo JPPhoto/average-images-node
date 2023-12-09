@@ -1,22 +1,20 @@
 # Copyright (c) 2023 Jonathan S. Pollack (https://github.com/JPPhoto)
 
 import numpy as np
-from PIL import Image
-
 from invokeai.app.invocations.baseinvocation import (
     BaseInvocation,
     InputField,
     InvocationContext,
     WithMetadata,
-    WithWorkflow,
     invocation,
 )
 from invokeai.app.invocations.primitives import ImageField, ImageOutput
 from invokeai.app.services.image_records.image_records_common import ImageCategory, ResourceOrigin
+from PIL import Image
 
 
 @invocation("average_images", title="Average Images", tags=["image"], version="1.0.0")
-class AverageImagesInvocation(BaseInvocation, WithMetadata, WithWorkflow):
+class AverageImagesInvocation(BaseInvocation, WithMetadata):
     """Average images"""
 
     images: list[ImageField] = InputField(description="The collection of images to average")
@@ -53,7 +51,7 @@ class AverageImagesInvocation(BaseInvocation, WithMetadata, WithWorkflow):
             session_id=context.graph_execution_state_id,
             is_intermediate=self.is_intermediate,
             metadata=self.metadata,
-            workflow=self.workflow,
+            workflow=context.workflow,
         )
 
         return ImageOutput(
