@@ -1,20 +1,19 @@
 # Copyright (c) 2023 Jonathan S. Pollack (https://github.com/JPPhoto)
 
 import numpy as np
-from invokeai.app.invocations.baseinvocation import (
-    BaseInvocation,
-    InputField,
-    InvocationContext,
-    WithMetadata,
-    invocation,
-)
-from invokeai.app.invocations.primitives import ImageField, ImageOutput
-from invokeai.app.services.image_records.image_records_common import ImageCategory, ResourceOrigin
 from PIL import Image
 
+from invokeai.app.invocations.baseinvocation import (
+    BaseInvocation,
+    InvocationContext,
+    invocation,
+)
+from invokeai.app.invocations.fields import InputField, WithBoard, WithMetadata
+from invokeai.app.invocations.primitives import ImageField, ImageOutput
 
-@invocation("average_images", title="Average Images", tags=["image"], version="1.0.0")
-class AverageImagesInvocation(BaseInvocation, WithMetadata):
+
+@invocation("average_images", title="Average Images", tags=["image"], version="1.1.0")
+class AverageImagesInvocation(BaseInvocation, WithMetadata, WithBoard):
     """Average images"""
 
     images: list[ImageField] = InputField(description="The collection of images to average")
@@ -27,7 +26,7 @@ class AverageImagesInvocation(BaseInvocation, WithMetadata):
         arr = None
 
         for this_image in self.images:
-            image = context.services.images.get_pil_image(this_image.image_name)
+            image = context.images.get_pil(this_image.image_name)
             image = image.convert("RGB")
             if arr is None:
                 w, h = image.size
@@ -43,19 +42,6 @@ class AverageImagesInvocation(BaseInvocation, WithMetadata):
         arr = arr.astype(np.uint8)
         image = Image.fromarray(arr, mode="RGB")
 
-        image_dto = context.services.images.create(
-            image=image,
-            image_origin=ResourceOrigin.INTERNAL,
-            image_category=ImageCategory.GENERAL,
-            node_id=self.id,
-            session_id=context.graph_execution_state_id,
-            is_intermediate=self.is_intermediate,
-            metadata=self.metadata,
-            workflow=context.workflow,
-        )
+        image_dto = context.images.save(image=image)
 
-        return ImageOutput(
-            image=ImageField(image_name=image_dto.image_name),
-            width=image_dto.width,
-            height=image_dto.height,
-        )
+        return ImageOutput.build(image_dto)
