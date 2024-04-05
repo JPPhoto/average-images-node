@@ -3,16 +3,19 @@
 import numpy as np
 from PIL import Image
 
-from invokeai.app.invocations.baseinvocation import (
+from invokeai.app.invocations.fields import WithBoard
+from invokeai.invocation_api import (
     BaseInvocation,
+    ImageField,
+    ImageOutput,
+    InputField,
     InvocationContext,
+    WithMetadata,
     invocation,
 )
-from invokeai.app.invocations.fields import InputField, WithBoard, WithMetadata
-from invokeai.app.invocations.primitives import ImageField, ImageOutput
 
 
-@invocation("average_images", title="Average Images", tags=["image"], version="1.1.0")
+@invocation("average_images", title="Average Images", tags=["image"], version="1.1.1")
 class AverageImagesInvocation(BaseInvocation, WithMetadata, WithBoard):
     """Average images"""
 
