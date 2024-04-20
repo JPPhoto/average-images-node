@@ -15,7 +15,7 @@ from invokeai.invocation_api import (
 )
 
 
-@invocation("average_images", title="Average Images", tags=["image"], version="1.1.2")
+@invocation("average_images", title="Average Images", tags=["image"], version="1.1.3")
 class AverageImagesInvocation(BaseInvocation, WithMetadata, WithBoard):
     """Average images"""
 
@@ -29,8 +29,8 @@ class AverageImagesInvocation(BaseInvocation, WithMetadata, WithBoard):
         arr = None
 
         for this_image in self.images:
-            image = context.images.get_pil(this_image.image_name)
-            image = image.convert("RGB")
+            image = context.images.get_pil(this_image.image_name, mode="RGB")
+
             if arr is None:
                 w, h = image.size
                 arr = np.zeros((h, w, 3), np.float32)
