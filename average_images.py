@@ -43,7 +43,7 @@ class AverageImagesInvocation(BaseInvocation, WithMetadata, WithBoard):
         arr = arr / len(self.images)
         arr = np.clip(arr ** (1.0 / self.gamma), 0, 1) * 255.0
         arr = arr.astype(np.uint8)
-        image = Image.fromarray(arr, mode="RGB")
+        image = Image.fromarray(arr)
 
         image_dto = context.images.save(image=image)
 
